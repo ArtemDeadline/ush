@@ -14,10 +14,10 @@ static t_input *init_input() {
 }
 
 // зчитування вхідного рядка з терміналу
-static char *mx_parse_char(t_input *input, int *flag, t_ush *ush, char *str) {
+static char * mx_parse_char(t_input *input, int *flag, t_ush *ush, char *str) {
     int k = 0;
     int i = mx_get_input_char(input); // зчитуємо символ з терміналу
-
+    //printf("%d\n\n", input->input_ch);
     // цикл, щоб по-символьно зчитувати рядок 
     while (k < i) {
         input->input_ch = input->input_ch_arr[k];
@@ -52,11 +52,12 @@ static char *mx_read_terminal_line(struct termios savetty, t_ush *ush) {
     // \r означає переміщення друкуючої головки на початок рядку
     // input->ctrl_c - змінна, яка відповідає за за сигнал CTRL+C
     while (input->input_ch != '\r' && input->ctrl_c != 1 && input->term_width != 0) {
+
         str = mx_parse_char(input, &flag, ush, str); // зчитування рядка
         if (ush->exit_status != -1) // перевірка на коректність роботи і сигнали
             break;
         if (input->len > 0)
-            temp = mx_add_char_to_cur_history(input, &flag, ush, temp); // додання поточної команди в історію
+            temp = mx_add_char_to_cur_history(input, &flag, ush, temp); // доповнення поточної команди в історію
     }
 
     if (ush->history->next != NULL) // якщо поточна команда не остання

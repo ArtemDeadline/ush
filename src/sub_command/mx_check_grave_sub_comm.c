@@ -33,7 +33,7 @@ void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i,  bool * gra
 static void insert_com_sub(t_com_sub *c, char **data, t_ush *ush) {
     //printf("Check grave_first: %d, grave_end: %d\n", c->space_first_index, c->space_end_index);
 
-    if(*data[c->space_first_index] == '`')
+    if((*data)[c->space_first_index] == '`')
         c->temp_str = mx_strindup(*data, c->space_first_index + 1, c->space_end_index);
     else
         c->temp_str = mx_strdup(*data);
@@ -90,8 +90,8 @@ int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *
 
                 //char *inside_comm = strndup( &( (*data)[c->back_first_index+2] ), c->back_end_index - c->back_first_index - 1);
                 char *inside_comm = strndup(&(*data)[c->space_first_index+1],  strlen(&(*data)[c->space_first_index+1]) - 1);
-                /*printf( "\nINSIDE COMMAND: |%s|\n",  inside_comm);
-                printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->space_first_index+1], (*data)[c->space_end_index]);*/
+                //printf( "\nINSIDE COMMAND: |%s|\n",  inside_comm);
+                //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->space_first_index+1], (*data)[c->space_end_index]);
 
                 if(check_other_sub_comm){
                     //printf("\n\n\nDATA: %s\n", *data);
@@ -134,16 +134,11 @@ int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *
                     printf( "\nINSIDE COMMAND: %s\n",  c->temp_str);
                     printf( "\noriginal: %s\n",  *data);
                     printf("Replace in |%s| substr |%s| on |%s|\n", *data, c->temp_str, c->cout_execute);*/
+                    mx_check_last_space(&c->cout_execute);
                     if(c->cout_execute == NULL)
                         *data = mx_replace_substr(*data, c->temp_str, "");
                     else
                         *data = mx_replace_substr(*data, c->temp_str, c->cout_execute);
-
-
-
-
-
-
 
 
                 

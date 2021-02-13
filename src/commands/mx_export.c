@@ -16,6 +16,8 @@ int mx_export(char **args) { //выполнение команды export
     int len_v = 0; // длина значения
 
     for (int y = 1; y < mx_count_arr_el(args); y++) { // цикл работающий пока длинна мас. аргументов 
+        args[y]=fill_parsed_str(args[y], 0, 1);
+        //printf("check export: |-|%s|-|\n", args[y]);
         len_n = mx_get_char_index(args[y], '=');
         if (len_n != -1) {
             len_v = mx_strlen(args[y]) - len_n - 1;

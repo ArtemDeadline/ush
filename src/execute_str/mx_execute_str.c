@@ -19,7 +19,7 @@ static void case_and_status_1(t_queue **queue, int i) {
 
 // перевірка на пустий рядок
 static bool check_is_str(char *data) {
-    char *temp = mx_strtrim(data);
+    char *temp = mx_strdup(data);
     bool status = false;
 
     if (mx_strlen(temp) != 0)

@@ -1,4 +1,4 @@
-#include "../../../inc/ush.h"
+#include "../../inc/ush.h"
 
 void mx_env_error(t_env *env, char **args, int i) {
     if (mx_file_exist(args[i]) != 1) // если файла нет -- ошибка

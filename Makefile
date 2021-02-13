@@ -21,7 +21,6 @@ SRC = $(addprefix $(SRC_DIR)/,\
 	utility_functions/*c \
 	redirect/*.c \
 	commands/*.c \
-	commands/env/*.c \
 	pids/*.c \
 	history/*.c )
 

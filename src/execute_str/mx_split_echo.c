@@ -22,7 +22,8 @@ char ** mx_strsplit_echo(char * src, char delimiter){
     for(int i = 0; i < mx_strlen(src); i++){
         
         // перевірка на одинарну цитату
-        if(src_ptr[i] == '\'' && src_ptr[i-1] != '\\' && bstart1 == false && bstart2 != true){
+        if( ((src_ptr[i] == '\'' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\'' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+        && bstart1 == false && bstart2 != true){
             bstart1 = true;
         }
         else if(src_ptr[i] == '\'' && bstart1 == true && bstart2 != true){
@@ -31,10 +32,12 @@ char ** mx_strsplit_echo(char * src, char delimiter){
         }
 
         // перевірка на подвійну цитату
-        if(src_ptr[i] == '\"' && src_ptr[i-1] != '\\' && bstart2 == false && bstart1 != true){
+        if( ((src_ptr[i] == '\"' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\"' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+         && bstart2 == false && bstart1 != true){
             bstart2 = true;
         }
-        else if(src_ptr[i] == '\"' && src_ptr[i-1] != '\\' && bstart2 == true && bstart1 != true){
+        else if( ((src_ptr[i] == '\"' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\"' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+        && bstart2 == true && bstart1 != true){
             counter++;
             bstart2 = false;
         }
@@ -74,11 +77,13 @@ char ** mx_strsplit_echo(char * src, char delimiter){
     for(int i = 0, j = 0; i < mx_strlen(src) && j < counter; i++){
 
         // пошук та вставка одинарної цитати
-        if(src_ptr[i] == '\'' && src_ptr[i-1] != '\\' && bstart1 == false && bstart2 != true){
+        if( ((src_ptr[i] == '\'' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\'' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+        && bstart1 == false && bstart2 != true){
             bstart1 = true;
             start1 = i;
         }
-        else if(src_ptr[i] == '\'' && bstart1 == true && bstart2 != true){
+        else if(src_ptr[i] == '\'' 
+        && bstart1 == true && bstart2 != true){
             bstart1 = false;
             end1 = i;
             result[j] = strndup(&(src_ptr[start1]), end1 - start1+1);
@@ -86,11 +91,13 @@ char ** mx_strsplit_echo(char * src, char delimiter){
         }
 
         // пошук та вставка двійної цитати
-        if(src_ptr[i] == '\"' && src_ptr[i-1] != '\\' && bstart2 == false && bstart1 != true){
+        if( ((src_ptr[i] == '\"' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\"' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+        && bstart2 == false && bstart1 != true){
             bstart2 = true;
             start2 = i;
         }
-        else if(src_ptr[i] == '\"' && src_ptr[i-1] != '\\' && bstart2 == true && bstart1 != true){
+        else if( ((src_ptr[i] == '\"' && src_ptr[i-1] != '\\') || (src_ptr[i] == '\"' && src_ptr[i-1] == '\\' &&  src_ptr[i-2] == '\\'))
+        && bstart2 == true && bstart1 != true){
             bstart2 = false;
             end2 =i;
             result[j] = strndup(&(src_ptr[start2]), end2 - start2+1);

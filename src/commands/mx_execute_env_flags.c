@@ -1,4 +1,4 @@
-#include "../../../inc/ush.h"
+#include "../../inc/ush.h"
 //
 static int do_command(t_env *env, char **args, int i) {
     int len = 0;

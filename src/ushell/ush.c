@@ -34,6 +34,7 @@ int main(int argc, char **argv){
         
         ush->command = mx_read_str(ush); // зчитування поточного рядка
 
+        //printf("RESULT OF READING: |%s|\n\n", ush->command);
 
         t_queue **queue = mx_parse_str(ush); // записуємо команди з рядку в порядку виконання
         

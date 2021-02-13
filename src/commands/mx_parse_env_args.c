@@ -1,4 +1,4 @@
-#include "../../../inc/ush.h"
+#include "../../inc/ush.h"
 
 static t_env *create_env(void) {
     t_env *env = (t_env *) malloc(sizeof (t_env));

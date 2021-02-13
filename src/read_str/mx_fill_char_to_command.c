@@ -19,6 +19,7 @@ static void mx_fill_char(t_input *input){
     if (input->coursor_position != input->len) // якщо це це ще не кінець рядку
         mx_insert_char(input, input->input_ch, input->coursor_position); // додання символу
     else if (input->command != NULL) { // додаємо символ в кінець
+        //printf("\nput in the end |%c|\n", input->input_ch);
         input->command = realloc(input->command, input->len + 2);
         input->command[input->len] = (char) input->input_ch;
         input->command[input->len + 1] = '\0';
@@ -53,19 +54,19 @@ static void mx_case_default(t_input *input) {
 // зчитування символу й додання його в str
 char *mx_fill_char_to_command(t_input *input) {
     char *str = NULL;
-    switch (input->input_ch) {
-        case MX_BACKSPACE: // обробка пробілу 
-            if (input->coursor_position > 0)
-                mx_case_backspace(input);
-            break;
-        case MX_ENTER: // обробка закінчення зчитування
-            str = mx_strtrim(input->command);
-            break;
-        case MX_TAB: // обробка TAB
-            break;
-        default: // додання символу
+    if(input->input_ch == MX_BACKSPACE){ // обробка видалення (delete)
+        if (input->coursor_position > 0)
+            mx_case_backspace(input);
+    }
+    else if(input->input_ch == MX_ENTER){ // обробка закінчення зчитування
+        str = strdup(input->command);
+        mx_check_last_space(&str);
+        //printf("\n|-|\tINPUT LINE: |%s|\t|-|\n", str);
+    }
+    else if(input->input_ch == MX_TAB){ // обробка TAB
+    }
+    else{ // додання символу
             mx_case_default(input);
-            break;
     }
 
     return  str;

@@ -238,5 +238,6 @@ int quot_error(char **parse_str, int *flag_n, int flag_quot);
 void escape_chars(int i, char *str, char *parse_str, int index);
 void free_pids(t_pid *pids);
 t_dbl_list *delete_elem(t_dbl_list *lst);
+void mx_check_last_space(char ** input);
 
 #endif

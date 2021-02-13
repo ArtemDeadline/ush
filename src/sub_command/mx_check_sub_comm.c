@@ -5,6 +5,8 @@ void mx_check_sub_comm(char **data, t_ush *ush) {
     // echo $(echo `echo $(echo HELLO DARNESS)`)
     // echo $(echo `echo $(echo "HELLO      DARNESS")`)
     // echo $(echo 1lvlv $(echo 2lvl $(echo 3lvl$(echo Hello my dear friend)3lvl) 2lvl) 1lvl)
+    // echo $(echo $(echo location $(echo $(echo hi bro   )   )   )   )
+    // echo `echo $(echo location $(echo $(echo hi bro   )   )   )   `
     // створення обробника команди та його ініціалізація дефолтними значеннями
     t_com_sub *com_sub = mx_create_com_sub();
     int exit = 0;

@@ -1,4 +1,4 @@
-#include "../../../inc/ush.h"
+#include "../../inc/ush.h"
 
 static char *homedir() {
     struct passwd *pw = getpwuid(getuid());

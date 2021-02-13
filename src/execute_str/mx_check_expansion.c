@@ -51,7 +51,7 @@ static void dollar_check(char **in, bool end_element) {
     }
     //printf("\nINDEX: %d\n", index);
     int i = index;
-    for(; i < mx_strlen(*in) && start_end != 2; i++){
+    for(; i < mx_strlen(*in) && (*in)[i] != ' ' && start_end != 2; i++){
         if((*in)[i] == '{' || (*in)[i] == '}')
             start_end++;        
         //printf("in[%d]: %c\t start_end: %d\n", i, (*in)[i], start_end);
@@ -96,12 +96,13 @@ static void dollar_check(char **in, bool end_element) {
 }
 
 //  перевірка на всякі розширення
+// echo $SHLVL $_ $USER $SHELL $HOME
 char **mx_check_expansion(char **str_input, int ret_val) {
     int len = 0;
     char **input = mx_strsplit_echo(*str_input, ' ');
     //printf("\ninput before expansion:\n");
     /*for (int i = 0; i < mx_count_arr_el(input); i++){
-        //printf("|%s|\n", input[i]);
+        printf("|%s|\n", input[i]);
     }*/
     for (int i = 0; i <= mx_count_arr_el(input); i++) {
         bool check = true;

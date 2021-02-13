@@ -3,7 +3,7 @@
 // видалення пробілів біля оператору
 char *mx_replace_operator(char *s) {
 
-    char *temp = mx_strtrim(s);
+    char *temp = mx_strdup(s);
     char *temp_two = NULL;
     /*printf("MX_REPLACE_OPERATOR_TRIM_TEMP: %s\n", temp);
     printf("SUBSTR_INDEX: %d\n", mx_get_substr_index(temp," && "));

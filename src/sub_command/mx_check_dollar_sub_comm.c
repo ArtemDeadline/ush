@@ -100,6 +100,7 @@ int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool 
             char* parsed_inside_comm = mx_strjoin(mx_strjoin("$(",inside_comm), ")");
             c->back_first_index = 0;
             c->back_end_index = mx_strlen(parsed_inside_comm)-1;
+            //mx_check_last_space(&parsed_inside_comm);
             insert_com_sub(c, &parsed_inside_comm, ush);
             //printf( "\n-----------CHANGED COMMAND: |%s|\n",  inside_comm);
             /*printf("Replace in |%s| substr |%s| on |%s|\n", *data, c->temp_str, c->cout_execute);
@@ -118,6 +119,7 @@ int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool 
             c->back_first_index = 0;
             c->back_end_index = mx_strlen(parsed_inside_comm)-1;*/
             //printf("\nELSE\n");
+            //mx_check_last_space(data);
             insert_com_sub(c, data, ush);
         }
         
@@ -128,6 +130,7 @@ int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool 
             //printf( "\nINSIDE COMMAND: %s\n",  c->temp_str);
             //printf( "\noriginal: %s\n",  *data);
             //printf("Replace in |%s| substr |%s| on |%s|\n", *data, c->temp_str, c->cout_execute);
+            mx_check_last_space(&c->cout_execute);
             if(c->cout_execute == NULL)
                 *data = mx_replace_substr(*data, c->temp_str, "");
             else

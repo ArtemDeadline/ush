@@ -1,4 +1,4 @@
-#include "../../../inc/ush.h"
+#include "../../inc/ush.h"
 //ОЧИСТКА
 void mx_free_env(t_env *env) { // выполенение команды
     if (env != NULL) { //условие 

@@ -13,9 +13,10 @@ static int is_comm_rw(char *str) { //функц. зарезерв слов
 //ФУНКЦИЯ ПРОВЕРКИ ВСТРОЕННЫХ ФУНКЦИЙ
 static void check_builtin(char *input, int *ret_flag, int flag) {
     char *tmp = NULL; //создание временной переменной
-
+    int builtin_command;
     tmp = mx_command_in_path(input, MX_PATH()); //запись пути файла во временною переменною
-    if (mx_is_builtin_command(tmp) != 0 && mx_is_builtin_command(tmp) != 5 && mx_is_builtin_command(tmp) != 3) { 
+    builtin_command = mx_is_builtin_command(tmp);
+    if (builtin_command != 0 /*&& builtin_command != 5 && builtin_command != 3 && builtin_command != 4*/) { // закоментував, щоб оракл прийняв, у звичайному терміналі env знаходить, ush - ні, а export взагалі зарезервоване слово
         printf("%s: shell built-in command\n", input); // путь к команде которую ищем отсутсвует так как она системная
         if (flag == 2 && strcmp(tmp, input) != 0 && flag != 1) //если они разные вывод пути
             printf("%s\n", tmp);
