@@ -1,10 +1,11 @@
 #include "../../inc/ush.h"
 
 // пошук початку й кінця змінних потипу $(...)
-void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i, bool * dollar_start, int * dollar_sub) {
+void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i, bool * dollar_start, int * dollar_sub, bool * qoute, int *qoute_number, int ** quote_array) {
     if ((*data)[i] == '$' && (*data)[i + 1] == '(' && (*data)[i-1] != '\\') {
         
-        
+        *qoute = false;
+
         if (!(*dollar_start)) {
             com_sub->back_first++;
             com_sub->back_first_index = i;
@@ -19,7 +20,7 @@ void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i, bool * doll
         
         //printf("\nSTART DOLLAR SUB COMMAND: i: %i | dol: %d\n", i, *dollar_sub);
     }
-    if (*dollar_start && (*data)[i] == ')' && (*data)[i-1] != '\\') {
+    if (*dollar_start && (*data)[i] == ')' && (*data)[i-1] != '\\' && !(*qoute)) {
         //printf("\n0:END DOLLAR SUB COMMAND: i: %i | dol: %d\n", i, *dollar_sub);
         if(*dollar_sub == 0) {
             com_sub->back_end++;
@@ -28,14 +29,93 @@ void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i, bool * doll
         }
         else{
             (*dollar_sub)--;
+            //printf("CHECK: if quote_array[%d] == %d+1 \t if %d == %d", (*qoute_number)-1, *dollar_sub, (*quote_array)[(*qoute_number)-1], (*dollar_sub)+1);
+            if( (*quote_array)!=NULL && (*quote_array)[(*qoute_number)-1] == (*dollar_sub)+1)
+                *qoute = true;
         }
         //printf("\n1:END DOLLAR SUB COMMAND: i: %i | dol: %d\n", i, *dollar_sub);
     }
+
+    if( (*data)[i] == '"' && (*data)[i-1] != '\\'){
+        *qoute = !(*qoute);
+        if(!(*qoute)){
+            (*qoute_number)--;
+            if((*qoute_number) == 0){
+                 free(*quote_array);
+                 quote_array = NULL;
+            }
+            else{
+                //free(  &((*quote_array)[(*qoute_number)+1])  );
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+            }
+        }
+        else{
+            (*qoute_number)++;
+            if((*qoute_number) == 1)
+                *quote_array = (int*) malloc(sizeof(int) * (*qoute_number));
+            else
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+
+            if((*dollar_start) == true)
+                (*quote_array)[(*qoute_number)-1] = (*dollar_sub) + 1;
+            else
+                (*quote_array)[(*qoute_number)-1] = 0;
+        }
+        /*int size = *qoute_number;
+        printf("SIZE: %d\n", size);
+        for(int i = 0; i <  size; i++){
+            printf("qoute_array[%d]: %d\n", i, (*quote_array)[i]);
+        }*/
+    }
+
+    if((*data)[i] == '\''){
+        if(*qoute)
+            *qoute = !(*qoute);
+        else if ((*data)[i-1] != '\\')
+            *qoute = !(*qoute);
+        
+        if(!(*qoute)){
+            (*qoute_number)--;
+
+            if((*qoute_number) == 0){
+                 free(*quote_array);
+                 quote_array = NULL;
+            }
+            else{
+                //free(  &((*quote_array)[(*qoute_number)+1])  );
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+            }
+
+
+        }
+        else{
+            (*qoute_number)++;
+
+            if((*qoute_number) == 1)
+                *quote_array = (int*) malloc(sizeof(int) * (*qoute_number));
+            else
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+
+            if((*dollar_start) == true)
+                (*quote_array)[(*qoute_number)-1] = (*dollar_sub) + 1;
+            else
+                (*quote_array)[(*qoute_number)-1] = 0;
+
+        }
+
+        /*int size = *qoute_number;
+        printf("SIZE: %d\n", size);
+        for(int i = 0; i <  size; i++){
+            printf("'qoute_array[%d]: %d'\n", i, (*quote_array)[i]);
+        }*/
+
+    }
+
 }
 
 static void insert_com_sub(t_com_sub *c, char **data, t_ush *ush) {
     // temp_str ініціалізується тим, що знаходиться всередині ()
-    //printf("\nINSERT:DATA: %s\n", *data);
+    //printf("\nINSERT:DATA: |%s|\n", *data);
     //printf("\nFIRST BACK: %d. END BACK: %d.\n", c->back_first_index, c->back_end_index);
     if((*data)[c->back_first_index] == '$'){
         c->temp_str = mx_strindup(*data,c->back_first_index + 2, c->back_end_index);
@@ -52,10 +132,10 @@ static void insert_com_sub(t_com_sub *c, char **data, t_ush *ush) {
 }
 
 //
-int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *dollar_start, int *dollar_sub) {
+int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *dollar_start, int *dollar_sub, bool * qoute, int * qoute_number, int **qoute_array) {
 
     // пошук початку й кінця субрядку $(...)
-    mx_find_sub_comm(c, data, i, dollar_start, dollar_sub);
+    mx_find_sub_comm(c, data, i, dollar_start, dollar_sub, qoute, qoute_number, qoute_array);
     //printf("back %d: we have start at %d and end at %d\n", *dollar_start, c->back_first_index, c->back_end_index);
     // якщо індекс першої появи $ менше індексу останньої появи )  
 
@@ -79,15 +159,23 @@ int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool 
         //mx_printchar('\n');
 
         //char *inside_comm = strndup( &( (*data)[c->back_first_index+2] ), c->back_end_index - c->back_first_index - 1);
-        char *inside_comm = strndup(&(*data)[c->back_first_index+2],  strlen(&(*data)[c->back_first_index+2]) - 1);
-        //printf( "\nINSIDE COMMAND: |%s|\n",  inside_comm);
-        //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->back_first_index+2], (*data)[c->back_end_index]);
+        int len = c->back_end_index - c->back_first_index - 2;
+        char *inside_comm = strndup(&(*data)[c->back_first_index+2], len);
+        /*printf( "\nINSIDE COMMAND: |%s|\n",  inside_comm);
+        printf("len = %d - %d - 2 =  %d\n", c->back_end_index, c->back_first_index, len);
+        printf("CHECKING: FIRST %d | BACK %d \n", c->back_first_index, c->back_end_index);
+        printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->back_first_index], (*data)[c->back_end_index]);
+        printf("\n\n\nDATA: %s\n\n\n", *data);*/
 
         if(check_other_sub_comm){
-            //printf("\n\n\nDATA: %s\n\n\n", *data);
+            
             //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->back_first_index+2], (*data)[c->back_end_index]);
-            char *inside_sub_comm = strndup( &( (*data)[c->back_first_index+2] ), strlen(&(*data)[c->back_first_index+2])-1);
-            //printf("INSIDE_SUB_COMM: %s\n\n\n", inside_sub_comm);
+            len = c->back_end_index - c->back_first_index -2;
+            //printf("len = %d - %d - 2 =  %d\n", c->back_end_index, c->back_first_index, len);
+            //printf("CHECKING: FIRST %d | BACK %d \n", c->back_first_index, c->back_end_index);
+            //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->back_first_index], (*data)[c->back_end_index]);
+            char *inside_sub_comm = strndup( &( (*data)[c->back_first_index+2] ), len);
+            //printf("\nINSIDE_SUB_COMM: |%s|\n", inside_sub_comm);
             //char *inside_sub_comm = strndup(&(*data)[c->back_first_index],  strlen(&(*data)[c->back_first_index+2]));
             //printf("\nfirst : %d, end: %d\n", c->back_first_index, c->back_end_index);
             mx_check_sub_comm(&inside_comm, ush);
@@ -120,16 +208,16 @@ int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool 
             c->back_end_index = mx_strlen(parsed_inside_comm)-1;*/
             //printf("\nELSE\n");
             //mx_check_last_space(data);
-            insert_com_sub(c, data, ush);
+            insert_com_sub(c, &inside_comm, ush);
         }
         
         
             
 
-            //printf( "\nCOUT_EXECUTE: %s\n",  c->cout_execute);
-            //printf( "\nINSIDE COMMAND: %s\n",  c->temp_str);
-            //printf( "\noriginal: %s\n",  *data);
-            //printf("Replace in |%s| substr |%s| on |%s|\n", *data, c->temp_str, c->cout_execute);
+            /*printf( "\nCOUT_EXECUTE: %s\n",  c->cout_execute);
+            printf( "\nINSIDE COMMAND: %s\n",  c->temp_str);
+            printf( "\noriginal: %s\n",  *data);
+            printf("Replace in |%s| substr |%s| on |%s|\n", *data, c->temp_str, c->cout_execute);*/
             mx_check_last_space(&c->cout_execute);
             if(c->cout_execute == NULL)
                 *data = mx_replace_substr(*data, c->temp_str, "");

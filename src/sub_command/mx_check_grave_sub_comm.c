@@ -1,20 +1,25 @@
 #include "../../inc/ush.h"
 
-void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i,  bool * grave_start, int * dollar_sub) {
+void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i,  bool * grave_start, int * dollar_sub, bool * qoute, int * qoute_number, int **quote_array) {
 
     //printf("|%c|\t{%d}\t[%d]\n", (*data)[i], com_sub->space, *dollar_sub);
     if ((*data)[i] == '$' && (*data)[i + 1] == '(' && (*data)[i-1] != '\\' && *grave_start) {
-            (*dollar_sub)++;
-            //printf("\n\ngrave: DOLLAR_SUB++\n\n");
+        (*dollar_sub)++;
+        *qoute = false;
+        //printf("\n\ngrave: DOLLAR_SUB++\n\n");
             //printf("\nSTART DOLLAR SUB COMMAND: i: %i | dol: %d\n", i, *dollar_sub);
     }
-    if ((*data)[i] == ')' && (*data)[i-1] != '\\' && *grave_start) {
-            (*dollar_sub)--;
+    if ((*data)[i] == ')' && (*data)[i-1] != '\\' && *grave_start && !(*qoute)) {
+        (*dollar_sub)--;
+        //printf("CHECK: if quote_array[%d] == %d \t if %d == %d", (*qoute_number)-1, *dollar_sub, (*quote_array)[(*qoute_number)-1], (*dollar_sub));
+        if((*quote_array)!=NULL && (*quote_array)[(*qoute_number)-1] == (*dollar_sub))
+            *qoute = true;
         //printf("\nEND DOLLAR SUB COMMAND: i: %i | dol: %d\n", i, *dollar_sub);
     }
     //printf("\nTeah2\n");
     if ((*data)[i] == '`' && (*data)[i-1] != '\\' && com_sub->space == 0 && *dollar_sub == 0) {
         //printf("\nYeah\n");
+        *qoute = false;
         *grave_start = true;
         com_sub->space++;
         com_sub->space_first_index = i;
@@ -24,9 +29,91 @@ void static mx_find_sub_comm(t_com_sub *com_sub, char **data, int i,  bool * gra
         *grave_start = false;
         com_sub->space++;
         com_sub->space_end_index = i;
+
+        //printf("CHECK: if quote_array[%d] == %d \t if %d == %d", (*qoute_number)-1, *dollar_sub, (*quote_array)[(*qoute_number)-1], (*dollar_sub));
+        if((*quote_array)!=NULL && (*quote_array)[(*qoute_number)-1] == (*dollar_sub))
+            *qoute = true;
+
+
         //printf("\nEND ` sub comm: %d\n", i);
     }
         //printf("\nTeah3\n");
+
+
+    if( (*data)[i] == '"' && (*data)[i-1] != '\\'){
+        *qoute = !(*qoute);
+        if(!(*qoute)){
+            (*qoute_number)--;
+            if((*qoute_number) == 0){
+                 free(*quote_array);
+                 quote_array = NULL;
+            }
+            else{
+                //free(  &((*quote_array)[(*qoute_number)+1])  );
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+            }
+        }
+        else{
+            (*qoute_number)++;
+            if((*qoute_number) == 1)
+                *quote_array = (int*) malloc(sizeof(int) * (*qoute_number));
+            else
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+
+            if((*grave_start) == true)
+                (*quote_array)[(*qoute_number)-1] = (*dollar_sub);
+            else
+                (*quote_array)[(*qoute_number)-1] = 0;
+        }
+        /*int size = *qoute_number;
+        printf("SIZE: %d\n", size);
+        for(int i = 0; i <  size; i++){
+            printf("qoute_array[%d]: %d\n", i, (*quote_array)[i]);
+        }*/
+    }
+
+    if((*data)[i] == '\''){
+        if(*qoute)
+            *qoute = !(*qoute);
+        else if ((*data)[i-1] != '\\')
+            *qoute = !(*qoute);
+        
+        if(!(*qoute)){
+            (*qoute_number)--;
+
+            if((*qoute_number) == 0){
+                 free(*quote_array);
+                 quote_array = NULL;
+            }
+            else{
+                //free(  &((*quote_array)[(*qoute_number)+1])  );
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+            }
+
+
+        }
+        else{
+            (*qoute_number)++;
+
+            if((*qoute_number) == 1)
+                *quote_array = (int*) malloc(sizeof(int) * (*qoute_number));
+            else
+                *quote_array = (int*) realloc( *quote_array, sizeof(int) * (*qoute_number));
+
+            if((*grave_start) == true)
+                (*quote_array)[(*qoute_number)-1] = (*dollar_sub);
+            else
+                (*quote_array)[(*qoute_number)-1] = 0;
+
+        }
+
+        /*int size = *qoute_number;
+        printf("SIZE: %d\n", size);
+        for(int i = 0; i <  size; i++){
+            printf("'qoute_array[%d]: %d'\n", i, (*quote_array)[i]);
+        }*/
+
+    }
 
 }
 
@@ -55,9 +142,9 @@ static bool is_space_fail(t_com_sub *c, int i)  {
 }
 
 // пошук вкладених команд, які написані всередині є `
-int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool * grave_start, int *dollar_sub) {
+int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool * grave_start, int *dollar_sub, bool * qoute, int * qoute_number, int **quote_array) {
     //printf("\nSAY 'NO' TO SEGMENTATION FAULT!\n");
-    mx_find_sub_comm(c, data, i, grave_start, dollar_sub);
+    mx_find_sub_comm(c, data, i, grave_start, dollar_sub, qoute, qoute_number, quote_array);
     
     /*mx_printstr("`true: ");
     mx_printchar((*data)[i]);
@@ -89,20 +176,20 @@ int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *
                 //mx_printchar('\n');
 
                 //char *inside_comm = strndup( &( (*data)[c->back_first_index+2] ), c->back_end_index - c->back_first_index - 1);
-                char *inside_comm = strndup(&(*data)[c->space_first_index+1],  strlen(&(*data)[c->space_first_index+1]) - 1);
+                char *inside_comm = strndup(&(*data)[c->space_first_index+1],  c->space_end_index - c->space_first_index - 1);
                 //printf( "\nINSIDE COMMAND: |%s|\n",  inside_comm);
                 //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->space_first_index+1], (*data)[c->space_end_index]);
 
                 if(check_other_sub_comm){
                     //printf("\n\n\nDATA: %s\n", *data);
                     //printf("CHECKING: FIRST %c | BACK %c \n", (*data)[c->back_first_index+2], (*data)[c->back_end_index]);
-                    char *inside_sub_comm = strndup( &( (*data)[c->space_first_index+1] ), strlen(&(*data)[c->space_first_index+1])-1);
+                    char *inside_sub_comm = strndup( &( (*data)[c->space_first_index+1] ), c->space_end_index - c->space_first_index - 1);
                     //printf("INSIDE_SUB_COMM: %s\n\n\n", inside_sub_comm);
                     //char *inside_sub_comm = strndup(&(*data)[c->back_first_index],  strlen(&(*data)[c->back_first_index+2]));
                     //printf("\nfirst : %d, end: %d\n", c->back_first_index, c->back_end_index);
                     mx_check_sub_comm(&inside_comm, ush);
-                    /*printf( "\nCHANGED COMMAND: |%s|\n",  inside_comm);
-                    printf("|-| Replace in |%s| substr |%s| on |%s|\n", *data, inside_sub_comm, inside_comm);*/
+                    //printf( "\nCHANGED COMMAND: |%s|\n",  inside_comm);
+                    //printf("|-| Replace in |%s| substr |%s| on |%s|\n", *data, inside_sub_comm, inside_comm);
                     //inside_sub_comm = mx_replace_substr(inside_sub_comm);
                     *data = mx_replace_substr(*data, inside_sub_comm, inside_comm);
                     //printf( "|-| replaced_original: %s\n",  *data);
@@ -129,7 +216,8 @@ int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *
                 
                 
                     
-
+                    c->cout_execute = mx_replace_substr(c->cout_execute, "\n", " ");
+                    
                     /*printf( "\nCOUT_EXECUTE: %s\n",  c->cout_execute);
                     printf( "\nINSIDE COMMAND: %s\n",  c->temp_str);
                     printf( "\noriginal: %s\n",  *data);

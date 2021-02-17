@@ -35,12 +35,13 @@ char *fill_parsed_str(char *str, int *flag_n, int flag) {
     int index = 0;
     bool single_flag = 0;
     bool double_citata =  0;
+    int len = mx_strlen(str);
 
-    //printf("\nflag: |%d|\n", flag);
+    //printf("\nflag: |%d|\nlen: %d\n", flag, len);
+    fflush(stdout);
+    for (int i = 0; str[i] != '\0' && i < len; i++) {
 
-    for (int i = 0; str[i] != '\0'; i++) {
-
-        //printf("[%d]: %c\n", i, str[i]);
+        //printf("\n[%d]: %c, flag_qoute: %d\n", i, str[i], flag_quot);
         
         if ( ((str[i] == '\'') || (str[i]== '\\'&& str[i+1] == '\'' )) 
         && single_flag == 1){
@@ -62,6 +63,8 @@ char *fill_parsed_str(char *str, int *flag_n, int flag) {
             parse_str[index++] = str[++i];
         else
             parse_str[index++] = str[i];
+
+        //printf("[%d]: %c, flag_qoute: %d\n", i, str[i], flag_quot);
 
     }
     parse_str[index] = '\0';

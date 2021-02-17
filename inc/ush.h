@@ -178,9 +178,9 @@ char ** mx_strsplit_echo(char *src, char delimiter);
 // Виконання вхідного рядка
 int mx_execute_str(t_queue **queue, t_ush *ush);
 void mx_check_sub_comm(char **data, t_ush *ush);
-int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool * grave_start, int *dollar_sub);
+int mx_check_grave_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool * grave_start, int *dollar_sub, bool * qoute, int * qoute_number, int **qoute_array);
 void mx_free_sub_comm(t_com_sub *com_sub);
-int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *dollar_start, int *dollar_sub);
+int mx_check_dollar_sub_comm(char **data, t_com_sub *c, t_ush *ush, int i, bool *dollar_start, int *dollar_sub, bool * qoute, int * qoute_number, int **qoute_array);
 t_com_sub* mx_create_com_sub();
 
 int mx_execute(t_ush *ush, char *str_input, int flag_redir, char **str_red);

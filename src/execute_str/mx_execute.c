@@ -73,7 +73,6 @@ static void check_for_redir(int *ret, int *fd, t_redirect *red, t_ush *ush, pid_
 
 // виконати команду
 int mx_execute(t_ush *ush, char *str_input, int flag_redir, char **str_red) {
-    
 
     //printf("EXECUTE\ninput_str: |%s|\n", str_input);
     //ush->curr_pid = ush->pids->num;
