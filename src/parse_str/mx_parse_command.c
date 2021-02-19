@@ -15,6 +15,7 @@ t_queue **mx_parse_command(char *command) {
     // цикл для заповнення черги
     for (int i = 0; i < size; i++) {
         arr_queue[i] = NULL;
+        //mx_check_last_space(&arr[i]);
         mx_insert_to_queue(arr[i], &arr_queue[i]);
     }
     mx_free_void_arr((void **)arr, size);

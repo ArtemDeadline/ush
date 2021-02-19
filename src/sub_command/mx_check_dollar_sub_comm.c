@@ -117,7 +117,7 @@ static void insert_com_sub(t_com_sub *c, char **data, t_ush *ush) {
     // temp_str ініціалізується тим, що знаходиться всередині ()
     //printf("\nINSERT:DATA: |%s|\n", *data);
     //printf("\nFIRST BACK: %d. END BACK: %d.\n", c->back_first_index, c->back_end_index);
-    if((*data)[c->back_first_index] == '$'){
+    if((*data)[c->back_first_index] == '$' && (*data)[c->back_first_index+1] == '('){
         c->temp_str = mx_strindup(*data,c->back_first_index + 2, c->back_end_index);
     }
     else

@@ -45,6 +45,7 @@ int mx_pwd(char **args, t_ush *ush) { //выполнение команды pwd
         is_link = mx_check_symlink(&position, flag, 2);
     }
     if (flag != 3) { //условие с проверкой флага
+        mx_check_last_space(&position);
         mx_printstr(position);
         mx_printchar('\n');
     }
